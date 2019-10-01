@@ -1,21 +1,50 @@
+#
 # Analysis Example
-# Hello World
+# Get Device List
+#
+# This analysis retrieves the device list of your account and print to the console.
+# There are examples on how to apply filter.
+#
+# Environment Variables
+# In order to use this analysis, you must setup the Environment Variable table.
+#
+# account_token: Your account token
+#
+# Steps to generate an account_token:
+# 1 - Enter the following link: https://admin.tago.io/account/
+# 2 - Select your Profile.
+# 3 - Enter Tokens tab.
+# 4 - Generate a new Token with Expires Never.
+# 5 - Press the Copy Button and place at the Environment Variables tab of this analysis.
 
-# Learn how to send messages to the console located on the TagoIO analysis screen.
-# You can use this principle to show any information during and after development.
-
+from tago import Account
 from tago import Analysis
 
 # The function myAnalysis will run when you execute your analysis
 def myAnalysis(context, scope):
-  # This will log "Hello World" at the TagoIO Analysis console
-  context.log("Hello World")
+  # reads the value of account_token from the environment variable
+  account_token = list(filter(lambda account_token: account_token['key'] == 'account_token', context.environment))
+  account_token = account_token[0]['value']
 
-  #  This will log the environment to the TagoIO Analysis console
-  context.log('Environment:', context.environment)
+  if not account_token:
+    return context.log("Missing account_token Environment Variable.")
+  
+  my_account = Account(account_token)
 
-  #  This will log the scope to the TagoIO Analysis console
-  context.log('my scope:', scope)
+  # Example of filtering devies by Tag.
+  # You can filter by: name, last_input, last_output, bucket, etc.
+  my_filter = {
+    'tags': [{
+      'key': 'keyOfTagWeWantToSearch', value: 'valueOfTagWeWantToSearch',
+    }],
+    # 'bucket': '55d269211a2e236c25bb9859',
+    # 'name': 'My Device'
+    # 'name': 'My Dev*
+  }
+  # Searching all devices with tag we want
+  devices = account.devices.list(1, ['id', 'tags'], my_filter, 10000)
+
+  context.log(devices)
 
 # The analysis token in only necessary to run the analysis outside TagoIO
 Analysis('MY-ANALYSIS-TOKEN-HERE').init(myAnalysis)
