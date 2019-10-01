@@ -43,8 +43,10 @@ def myAnalysis(context, scope):
   }
   # Searching all devices with tag we want
   devices = account.devices.list(1, ['id', 'tags'], my_filter, 10000)
-
-  context.log(devices)
+  if devices['status'] is True:
+    context.log(devices['result']) # Array with data
+  else:
+    context.log(devices['message']) # Error (if status is False)
 
 # The analysis token in only necessary to run the analysis outside TagoIO
 Analysis('MY-ANALYSIS-TOKEN-HERE').init(myAnalysis)
