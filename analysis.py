@@ -28,21 +28,26 @@ def myAnalysis(context, scope):
 
   if not account_token:
     return context.log("Missing account_token Environment Variable.")
-  
+
   my_account = Account(account_token)
 
   # Example of filtering devies by Tag.
   # You can filter by: name, last_input, last_output, bucket, etc.
   my_filter = {
     'tags': [{
-      'key': 'keyOfTagWeWantToSearch', value: 'valueOfTagWeWantToSearch',
+      'key': 'keyOfTagWeWantToSearch', "value": 'valueOfTagWeWantToSearch',
     }],
     # 'bucket': '55d269211a2e236c25bb9859',
     # 'name': 'My Device'
     # 'name': 'My Dev*
   }
   # Searching all devices with tag we want
-  devices = account.devices.list(1, ['id', 'tags'], my_filter, 10000)
+  devices = my_account.devices.list(
+    page=1,
+    fields=["id", "tags"],
+    # filter=my_filter,
+    amount=20
+  )
   if devices['status'] is True:
     context.log(devices['result']) # Array with data
   else:
