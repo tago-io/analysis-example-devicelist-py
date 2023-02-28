@@ -21,7 +21,15 @@ from tagoio_sdk import Account, Analysis
 from tagoio_sdk.modules.Account.Device_Type import DeviceInfoList
 
 
-def query_devices(account: Account) -> list[DeviceInfoList]:
+def get_device_list(account: Account) -> list[DeviceInfoList]:
+    """Retrieves the device list of your account.
+
+    Args:
+        account (Account): Instance of the class Account
+
+    Returns:
+        list[DeviceInfoList]: List of devices
+    """
     # Example of filtering devices by Tag.
     # You can filter by: name, last_input, last_output, bucket, etc.
     my_filter = {
@@ -29,7 +37,8 @@ def query_devices(account: Account) -> list[DeviceInfoList]:
             {"key": "keyOfTagWeWantToSearch", "value": "valueOfTagWeWantToSearch"}
         ],
         # "bucket": "55d269211a2e236c25bb9859",
-        # "name": "My Device"
+        # "name": "My Device",
+        # "name": "My Dev*"
     }
 
     devices = account.devices.listDevice(
@@ -39,7 +48,7 @@ def query_devices(account: Account) -> list[DeviceInfoList]:
     return devices
 
 
-def list_devices(context: list[dict], scope: list) -> None:
+def my_analysis(context, scope: list) -> None:
     # reads the value of account_token from the environment variable
     account_token = list(
         filter(
@@ -47,17 +56,18 @@ def list_devices(context: list[dict], scope: list) -> None:
             context.environment,
         )
     )
-    account_token = account_token[0]["value"]
+    if account_token:
+        account_token = account_token[0].get("value")
 
     if not account_token:
         return print("Missing account_token Environment Variable.")
 
     account = Account(params={"token": account_token})
-    list_devices = query_devices(account=account)
+    list_devices = get_device_list(account=account)
 
     print(list_devices)
     print(f"Total devices: {len(list_devices)}")
 
 
 # The analysis token in only necessary to run the analysis outside TagoIO
-Analysis(params={"token": "MY-ANALYSIS-TOKEN-HERE"}).init(list_devices)
+Analysis(params={"token": "MY-ANALYSIS-TOKEN-HERE"}).init(my_analysis)
