@@ -21,40 +21,42 @@ from tagoio_sdk import Account, Analysis
 from tagoio_sdk.modules.Account.Device_Type import DeviceInfoList
 
 
-def query_devices(account: Account) ->list[DeviceInfoList]:
-	# Example of filtering devices by Tag.
-	# You can filter by: name, last_input, last_output, bucket, etc.
-	my_filter = {
-		"tags": [
-			{"key": "keyOfTagWeWantToSearch", "value": "valueOfTagWeWantToSearch"}
-		],
-		# "bucket": "55d269211a2e236c25bb9859",
-		# "name": "My Device"
-	}
+def query_devices(account: Account) -> list[DeviceInfoList]:
+    # Example of filtering devices by Tag.
+    # You can filter by: name, last_input, last_output, bucket, etc.
+    my_filter = {
+        "tags": [
+            {"key": "keyOfTagWeWantToSearch", "value": "valueOfTagWeWantToSearch"}
+        ],
+        # "bucket": "55d269211a2e236c25bb9859",
+        # "name": "My Device"
+    }
 
-	devices = account.devices.listDevice({
-		"page": 1,
-		"fields": ["id", "tags"],
-		"filter": my_filter,
-		"amount": 20
-	})
+    devices = account.devices.listDevice(
+        {"page": 1, "fields": ["id", "tags"], "filter": my_filter, "amount": 20}
+    )
 
-	return devices
+    return devices
 
 
 def list_devices(context: list[dict], scope: list) -> None:
-	# reads the value of account_token from the environment variable
-	account_token = list(filter(lambda account_token: account_token["key"] == "account_token", context.environment))
-	account_token = account_token[0]["value"]
+    # reads the value of account_token from the environment variable
+    account_token = list(
+        filter(
+            lambda account_token: account_token["key"] == "account_token",
+            context.environment,
+        )
+    )
+    account_token = account_token[0]["value"]
 
-	if not account_token:
-		return print("Missing account_token Environment Variable.")
+    if not account_token:
+        return print("Missing account_token Environment Variable.")
 
-	account =  Account(params={"token": account_token})
-	list_devices = query_devices(account=account)
+    account = Account(params={"token": account_token})
+    list_devices = query_devices(account=account)
 
-	print(list_devices)
-	print(f"Total devices: {len(list_devices)}")
+    print(list_devices)
+    print(f"Total devices: {len(list_devices)}")
 
 
 # The analysis token in only necessary to run the analysis outside TagoIO
